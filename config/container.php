@@ -29,4 +29,9 @@ return [
         // Example 4: providing an alias but with automagic injections via ReflectionClass
         ReportConfigInterface::class => ReportConfig::class,
     ],
+
+    'settings' => [
+        // Example 5: custom scalar values (the constructor argument should be named exactly like this)
+        'language' => 'pt-br',
+    ],
 ];

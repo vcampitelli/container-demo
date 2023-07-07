@@ -27,6 +27,13 @@ class Container implements ContainerInterface
     private array $aliases = [];
 
     /**
+     * Custom scalar definitions to inject values into built-in arguments (e.g. string, int).
+     *
+     * @var array
+     */
+    private array $settings = [];
+
+    /**
      * Constructor
      *
      * @param array $config
@@ -39,6 +46,10 @@ class Container implements ContainerInterface
 
         if (isset($config['aliases'])) {
             $this->aliases = (array) $config['aliases'];
+        }
+
+        if (isset($config['settings'])) {
+            $this->settings = (array) $config['settings'];
         }
     }
 
@@ -61,6 +72,11 @@ class Container implements ContainerInterface
         // If there's a factory associated to this service...
         if (isset($this->factories[$id])) {
             return $this->getFromFactory($id);
+        }
+
+        // If there's a setting associated to this ID...
+        if (isset($this->settings[$id])) {
+            return $this->settings[$id];
         }
 
         if (!\class_exists($id)) {
@@ -134,10 +150,14 @@ class Container implements ContainerInterface
         $constructor = $reflection->getConstructor();
         if (isset($constructor)) {
             foreach ($constructor->getParameters() as $parameter) {
+                // If this is a scalar type (e.g. string, int), we'll use the parameter name to retrieve the value
+                // from the Container. Otherwise, we'll use the class name.
+                $argumentId = ($parameter->getType()->isBuiltin())
+                    ? \strtolower($parameter->getName())
+                    : $parameter->getType()->getName();
+
                 // Fetching instances from this container. This could generate a recursion loop.
-                $args[] = $this->get(
-                    $parameter->getType()->getName()
-                );
+                $args[] = $this->get($argumentId);
             }
         }
 
