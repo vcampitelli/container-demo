@@ -1,4 +1,4 @@
-# simple-container
+# container-demo
 Simple package to show how [PSR-11 Containers](https://www.php-fig.org/psr/psr-11/) work.
 
 This is for educational purposes only. For real production cases, you have several other packages to choose:

@@ -11,7 +11,6 @@ use ReflectionException;
  */
 class Container implements ContainerInterface
 {
-
     /**
      * Holds all factories
      *
@@ -58,10 +57,10 @@ class Container implements ContainerInterface
      *
      * @param string $id
      *
-     * @return object
-     * @throws NotFoundException
+     * @return mixed
+     * @throws NotFoundException|\ReflectionException
      */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         // If there's an alias for this service, we'll build it
         if (isset($this->aliases[$id])) {
@@ -132,7 +131,7 @@ class Container implements ContainerInterface
      * @param string $id
      *
      * @return object
-     * @throws NotFoundException
+     * @throws NotFoundException|\ReflectionException
      */
     private function getFromReflection(string $id): object
     {
@@ -163,7 +162,7 @@ class Container implements ContainerInterface
 
         // If we don't have arguments, creating it directly via `new` is way faster
         if (empty($args)) {
-            return new $id;
+            return new $id();
         }
 
         return $reflection->newInstanceArgs($args);
@@ -180,5 +179,4 @@ class Container implements ContainerInterface
     {
         return isset($this->factories[$id]) || isset($this->aliases[$id]) || \class_exists($id);
     }
-
 }
